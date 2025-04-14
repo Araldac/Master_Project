@@ -9,7 +9,7 @@ import seaborn as sns
 import networkx as nx
 from scipy.optimize import minimize_scalar
 
-#efficient code is in efficient code, great
+#efficient code is in efficient code, greatt
 def system_dynamics_efficient(t, y, C, species_contrib, w, K, d, S, M, one_minus_l, e =0):
     N = y[:S]  # Species populations
     R = y[S:S+M]  # Resource concentrations
