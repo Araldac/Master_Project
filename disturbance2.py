@@ -339,10 +339,10 @@ def run_simulation(S, M, specialization, nestedness_pb, t_max, seed1, d, replica
     t_max=2500
     t_span = (0, t_max) 
 
-    for type_d in ["dil", "Ant", "R", "S"]: 
+    for type_d in ["dil", "Ant", "R"]: 
         if type_d == "dil": 
 
-            for dil in range(1, 40, 2):
+            for dil in range(1, 20, 2):
                 d2=dil
                 solution2 = solve_ivp(lambda t, y: system_dynamics_efficient(t, y, C, species_contrib, w, K, d2, S, M, one_minus_l), t_span, y0, "LSODA", t_eval=np.linspace(0, t_max, t_max))
                 N_results2 = solution2.y[:S, :]
@@ -459,68 +459,8 @@ def run_simulation(S, M, specialization, nestedness_pb, t_max, seed1, d, replica
 
                 results.append(result)
 
-        
-        if type_d == "S":
-            for RS in range(0, 22):
-                indices_y0 = np.where(y0[:S] > 10e-6 )[0]
-                y02=y0
-                if len(indices_y0) >= RS:  # Randomly select one index and set it to 0
-                    random_index = random.sample(list(indices_y0), k=RS)
-                    y02[random_index] = 0
-
-                solution2 = solve_ivp(lambda t, y: system_dynamics_efficient(t, y, C, species_contrib, w, K, d, S, M, one_minus_l), t_span, y02, "LSODA", t_eval=np.linspace(0, t_max, t_max))
-                N_results2 = solution2.y[:S, :]
-                coex_sp2, survivors2, final_ab2 = countcoex(S, N_results2, solution2)
-                coex_sp8, survivors8, final_ab8, coex_sp16, survivors16, final_ab16 = countcoex2(S, N_results2, solution2)
-                totalNResults=  np.hstack((N_results, N_results2))
-        
-
-                plt.figure(figsize=(12, 6))
-                for species in range(S):
-                    plt.plot(range(0, 5000), totalNResults[species, :], label=f'Species {species + 1}')
-                plt.xlabel('Time')
-                plt.ylabel('Population Size x10^8 (cells/ml)')
-                plt.title(f'Population Dynamics after disturbance {type_d} from {coex_sp} to {coex_sp2} coexsiting species')
-                plt.legend(loc='upper right')
-                plt.grid()
-                plt.axvline(x=2500, color= "r", linestyle= "dashed" )
-                plt.show()
-
-                result= {
-                "replica_number": None,
-                "seed": seed1,
-                "S": S,
-                "M": M,
-                "specialization": specialization,
-                "Spebefore": np.mean(H_b),
-                "Speafter": np.mean(H_e),
-                "nestedness": nestedness_pb,
-                "t_max": t_max,
-                "K": K.tolist(),
-                "Resources given": np.sum(K>0),
-                "dilution": d,
-                "e": 0,
-                "l_sum": np.sum(l),
-                "nb_coexisting_species": coex_sp,
-                "coexisting_species": survivors,
-                "final_abundances": final_ab,
-                "nb_coexisting_species_end": coex_sp2,
-                "coexisting_species_end": survivors2,
-                "final_abundances_end": final_ab2,
-                "nb_coexisting_species8": coex_sp8,
-                "coexisting_species8": survivors8,
-                "final_abundances8": final_ab8,
-                "nb_coexisting_species16": coex_sp16,
-                "coexisting_species16": survivors16,
-                "final_abundances16": final_ab16,
-                "type": type_d,
-                "Value": RS,
-                "RS":RS}
-
-                results.append(result)
-
         if type_d == "Ant":
-            for A in range(0, 30, 2):
+            for A in range(0, 20, 2):
                 #e=np.random.uniform(1, A, size=S)
                 e=np.random.normal(A, A/4, size=S)
  
