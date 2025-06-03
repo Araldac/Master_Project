@@ -300,7 +300,7 @@ dataw05$specialization[dataw05$specialization == "0.5"] <- "Mid (0.5)"#update sp
     
     
 #Part 2: Disturbance analysis:----
-    disturbance<-read.csv("~/Master/MP/Data/Data200/disturbance_complete.csv", sep=";") #import the data
+    disturbance<-read.csv("rawdata_4_disturbance.csv", sep=";") #import the data
     
     ##add initial resourcs given for the disturbances (=K at coex)
     disturbance <- disturbance %>%
@@ -587,7 +587,7 @@ dataw05$specialization[dataw05$specialization == "0.5"] <- "Mid (0.5)"#update sp
 
 #Part 3: Comparison with realistic matrix----
     #load the data
-    dalbello<-read.csv("dalbello_data.csv", sep=",")
+    dalbello<-read.csv("rawdata_5_dbcomparison.csv", sep=",")
     
     dataFigure$nestedness[dataFigure$nestedness==-1]<-"No CF"
     
