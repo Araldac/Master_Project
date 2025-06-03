@@ -23,10 +23,10 @@ library(gridExtra)
 library(AICcmodavg)
 library(car)
 
-setwd("~/Master/MP/Data/Data200")
+setwd("~/")
 
 #Part 1: Coexistence analysis:----
-data<-read.csv("~/Master/MP/Data/Data200/rawdata_1_coexistence.csv", sep=";") #import the data
+data<-read.csv("rawdata_1_coexistence.csv", sep=";") #import the data
     #calculate Shannon disveristy and total biomass
 shannon_diversity <- function(abundances) {
   if (is.character(abundances)) {
@@ -172,7 +172,7 @@ par(mfrow=c(1,1))
   ##Plot Figure 6: Changes of specialization score from the initial community to the survival one----
     ###Figure 6a- Difference initial- final specialization score----
 
-final05<-read.csv("FINAL_data05.csv", sep= ";") #load the data of communities with specilaization score of 0.5
+final05<-read.csv("rawdata_2_05.csv", sep= ";") #load the data of communities with specilaization score of 0.5
 dataw05<-rbind(dataFigure[,1:16], final05) #join with the other dataset
 dataw05$nestedness[dataw05$nestedness==-1]<-"No CF" #update the No CF label
 dataw05$specialization[dataw05$specialization == "0.15"] <- "Generalist" #update specilization label
@@ -254,7 +254,7 @@ dataw05$specialization[dataw05$specialization == "0.5"] <- "Mid (0.5)"#update sp
 
   ##Plot Figure 7: Changes in richness for resource production regimes due to resource identity----
     
-    K200<- read.csv("data_K200.csv", sep=";") #load the data 
+    K200<- read.csv("rawdata_3_firstRG", sep=";") #load the data 
     K200$specialization[K200$specialization==0.5]<-"Random" #modfiy specialization label
     K200$nestedness[K200$nestedness==-1]<-"No CF" #modify nestedness label
 
@@ -374,7 +374,7 @@ dataw05$specialization[dataw05$specialization == "0.5"] <- "Mid (0.5)"#update sp
                          xout = 11, 
                          ties = mean)$y
           
-          # Ajuster le modèle de décadence de Gupta
+          # Ajuster le modÃ¨le de dÃ©cadence de Gupta
           model_gupta <- nls(nb_coexisting_species_end ~ funfit(Value, c50, P),
                              data = sub_data,
                              start = list(P = 1, c50= 0.15))
@@ -384,7 +384,7 @@ dataw05$specialization[dataw05$specialization == "0.5"] <- "Mid (0.5)"#update sp
           Cestimate <- s$parameters["c50", "Estimate"]
           RSS <- deviance(model_gupta)
           
-          # Ajouter les résultats à la table finale
+          # Ajouter les rÃ©sultats Ã  la table finale
           decay_parameter <- rbind(decay_parameter, data.frame(
             Seed = seed_t,
             Disturbance = type_t,
