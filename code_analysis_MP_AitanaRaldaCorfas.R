@@ -61,8 +61,8 @@ data <- data %>%
     biomass = sapply(final_abundances, biomass),
     ShannonI = sapply(final_abundances, shannon_diversity))
 
-  ##Plot Figure 5: Richness of communities with different community structure----
-    ###Figure 5a- Saturation curves----
+  ##Plot Figure 3: Richness of communities with different community structure----
+    ###Figure 3a- Saturation curves----
 ##copy the datset to implement the modifciation in the labels for the figure
 dataFigure<-data
   # Replace values in specialization column
@@ -100,9 +100,7 @@ res_labels <- c(
 # Line for total resources
 total_res_line <- data.frame(y = 80, label = "# Total resources")
 
-#code for  Figure 1
-nrow(dataFigure)
-View(dataFigure)
+
 ggplot(dataFigure, aes(S, nb_coexisting_species, color = as.factor(nestedness))) +
   geom_point(size = 0.2, alpha = 0.2) +
   #geom_smooth() + 
@@ -128,7 +126,7 @@ ggplot(dataFigure, aes(S, nb_coexisting_species, color = as.factor(nestedness)))
     "# Resources given" = "dashed"
   ))
 
-    ###Figure 5b- Boxplot at S=200----
+    ###Figure 3b- Boxplot at S=200----
 
 ggplot(dataFigure[dataFigure$S==200,], aes(nestedness,nb_coexisting_species, fill=nestedness ))+
   geom_boxplot()+
@@ -169,8 +167,8 @@ par(mfrow=c(1,1))
 
 
 
-  ##Plot Figure 6: Changes of specialization score from the initial community to the survival one----
-    ###Figure 6a- Difference initial- final specialization score----
+  ##Plot Figure 4: Changes of specialization score from the initial community to the survival one----
+    ###Figure 4a- Difference initial- final specialization score----
 
 final05<-read.csv("rawdata_2_05.csv", sep= ";") #load the data of communities with specilaization score of 0.5
 dataw05<-rbind(dataFigure[,1:16], final05) #join with the other dataset
@@ -199,7 +197,7 @@ dataw05$specialization[dataw05$specialization == "0.5"] <- "Mid (0.5)"#update sp
     t.test(dataw05$Spebefore[dataw05$specialization== "Random"], dataw05$Speafter[dataw05$specialization== "Random"], alternative= "less")
     #t = -42.071, df = 12479, p-value < 2.2e-16
     
-    ###Figure 6b- Initial vs final specialization score global comparison ----
+    ###Figure 4b- Initial vs final specialization score global comparison ----
     
     #modify the data to obtain mean +sd 
     BA05 <- dataw05 %>%
@@ -252,7 +250,7 @@ dataw05$specialization[dataw05$specialization == "0.5"] <- "Mid (0.5)"#update sp
 
 
 
-  ##Plot Figure 7: Changes in richness for resource production regimes due to resource identity----
+  ##Plot Figure 5: Changes in richness for resource production regimes due to resource identity----
     
     K200<- read.csv("rawdata_3_firstRG", sep=";") #load the data 
     K200$specialization[K200$specialization==0.5]<-"Random" #modfiy specialization label
@@ -374,7 +372,7 @@ dataw05$specialization[dataw05$specialization == "0.5"] <- "Mid (0.5)"#update sp
                          xout = 11, 
                          ties = mean)$y
           
-          # Ajuster le modèle de décadence de Gupta
+          # Adjust model with Gupta decay
           model_gupta <- nls(nb_coexisting_species_end ~ funfit(Value, c50, P),
                              data = sub_data,
                              start = list(P = 1, c50= 0.15))
@@ -384,7 +382,7 @@ dataw05$specialization[dataw05$specialization == "0.5"] <- "Mid (0.5)"#update sp
           Cestimate <- s$parameters["c50", "Estimate"]
           RSS <- deviance(model_gupta)
           
-          # Ajouter les résultats à la table finale
+          # add results to dataset
           decay_parameter <- rbind(decay_parameter, data.frame(
             Seed = seed_t,
             Disturbance = type_t,
@@ -412,7 +410,7 @@ dataw05$specialization[dataw05$specialization == "0.5"] <- "Mid (0.5)"#update sp
       ) %>%
       ungroup()
     
-  ##Figure 8- Robustness of communities to the three disturbances----
+  ##Figure 6- Robustness of communities to the three disturbances----
     #Define custom labels for the facets
     facet_labels <- c(
       Ant = "Antibiotic",
@@ -484,70 +482,9 @@ dataw05$specialization[dataw05$specialization == "0.5"] <- "Mid (0.5)"#update sp
     
     
     
-  ##Figure 9- Initial Diversity ----
-    speci_labels <- c(
-      `-1` = "Random",
-     `0.85` = "Specialist"
-    )
+ 
     
-    res_labels <- c(
-      `8` = "Resources given: 8",
-      `16` = "Resources given: 16",
-      `32` = "Resources given: 32",
-      `64` = "Resources given: 64"
-    )
-    
-    ggplot(disturbance[disturbance$type =="coex",], aes(as.factor(nestedness) ,ShannonI, fill=as.factor(nestedness) ))+
-      geom_boxplot()+
-      geom_jitter(color="black", size=0.4, alpha=0.7)+
-      ylab("Diversity (Shannon Index)")+
-      xlab("Nestedness")+
-      #ggtitle("Diversity of communities used for the disturbance analysis") +
-      labs(colour = "Nestedness")+
-      scale_x_discrete(labels=c( "0", "0.5", "1", "No CF"))+
-      theme_bw()+
-      theme(legend.position="none")+
-      facet_grid(specialization~Resources.given, labeller =  labeller(Resources.given = res_labels,
-                                                                      specialization = speci_labels))
-    ##Wilcox test on diversity
-    ###specialization
-    wilcox.test(disturbance$ShannonI[disturbance$type =="coex" & disturbance$specialization == "0.85"], disturbance$ShannonI[disturbance$type =="coex" &disturbance$specialization == "-1"])
-    ##crossfeeding
-    wilcox.test(disturbance$ShannonI[disturbance$type =="coex" & disturbance$nestedness == "-1"], disturbance$ShannonI[disturbance$type =="coex" &disturbance$nestedness != "-1"])
-    #resources given
-    wilcox.test(disturbance$ShannonI[disturbance$type =="coex" & disturbance$initial_resources_given == 64], disturbance$ShannonI[disturbance$type =="coex" &disturbance$initial_resources_given == 32])
-    #nestedness
-    pairwise.wilcox.test(disturbance$ShannonI[disturbance$type =="coex"], disturbance$nestedness[disturbance$type =="coex"])
-    
-  ##Figure 10- Initial Biomass---- 
-    ggplot(disturbance[disturbance$type =="coex",], aes(as.factor(nestedness) ,biomass, fill=as.factor(nestedness) ))+
-      geom_boxplot()+
-      geom_jitter(color="black", size=0.4, alpha=0.7)+
-      ylab("Total abundance")+
-      xlab("Nestedness")+
-      #ggtitle("Biomass of communities used for the disturbance analysis") +
-      labs(colour = "Nestedness")+
-      scale_x_discrete(labels=c( "0", "0.5", "1", "No CF"))+
-      theme_bw()+
-      theme(legend.position="none")+
-      facet_grid(specialization~Resources.given, labeller =  labeller(Resources.given = res_labels,
-                                                                      specialization = speci_labels))
-    ##Wilcox test on initial biomass
-    ###specialization
-    wilcox.test(disturbance$biomass[disturbance$type =="coex" & disturbance$specialization == "0.85"], disturbance$biomass[disturbance$type =="coex" &disturbance$specialization == "-1"])
-    ##crossfeeding
-    wilcox.test(disturbance$biomass[disturbance$type =="coex" & disturbance$nestedness == "-1"], disturbance$biomass[disturbance$type =="coex" &disturbance$nestedness != "-1"])
-    #resources given
-    wilcox.test(disturbance$biomass[disturbance$type =="coex" & disturbance$initial_resources_given == 64], disturbance$biomass[disturbance$type =="coex" &disturbance$initial_resources_given == 32])
-    #nestedness
-    pairwise.wilcox.test(disturbance$biomass[disturbance$type =="coex"], disturbance$nestedness[disturbance$type =="coex"])
-    
-    
-    
-    
-    
-    
-  ##Figure 11- Correlation of robustness among disturbances: Antibiotics, Dilution and Resource removal----
+  ##Figure 7- Correlation of robustness among disturbances: Antibiotics, Dilution and Resource removal----
     mean_rc50 <- decay_parameter %>%
       filter(Disturbance %in% c("Ant", "R", "dil")) %>%
       group_by(Seed, Disturbance) %>%
@@ -598,7 +535,7 @@ dataw05$specialization[dataw05$specialization == "0.5"] <- "Mid (0.5)"#update sp
       summarize(mean_sp= mean(coexisitng.species, na.rm=TRUE),
                 sd_sp= sd(coexisitng.species, na.rm=TRUE) )
     
-    ##Figure 12- Comparison realistic matrix----
+    ##Figure 8- Comparison realistic matrix----
     db_label<-c(
       "0"= "Sparcity: 0.5",
       "0.95"="Sparcity: 0.97" )
@@ -639,15 +576,30 @@ dataw05$specialization[dataw05$specialization == "0.5"] <- "Mid (0.5)"#update sp
     DB_C<-aov(coexisitng.species~Crossfeeding, dalbello_analysis[dalbello_analysis$Sparcity==0.95,])
 
 
-    
-    
-    
-        
-    
-
 #Suppelementary Figures----
+
+##Figure S3: comparison mid (0.5 specialization score) and random communities
+    a_mean <- dataw05 %>% 
+      group_by(Resources.given, specialization, nestedness) %>% 
+      summarize(Rg = mean(as.numeric(as.character(Resources.given))))
     
-##Figure 16: Saturation curve with diversity
+    ggplot(dataw05[dataw05$specialization %in% c("Mid (0.5)", "Random"),], aes(S, nb_coexisting_species, color=specialization ))+
+      
+    geom_point(size = 0.2, alpha = 0.2) +
+      #geom_smooth() + 
+      stat_summary(aes(y = nb_coexisting_species ), fun=mean, linewidth = 1, geom="line")+
+      ylim(0, 85) +
+      xlab("Sampled species") +
+      ylab("Surviving species") +
+    
+      # Correct facet order and label mapping
+      facet_grid(  nestedness~Resources.given, labeller = label_both)+
+      
+      #ggtitle("Coexisting species with different nestedness") +
+      labs(color = "Specialization", linetype = NULL) +
+      theme_bw()
+    
+##Figure S7: Saturation curve with diversity
 ggplot(dataFigure, aes(S, ShannonI, color=as.factor(nestedness)))+
   geom_point(size=0.2, alpha=0.2)+
   geom_smooth() + 
@@ -658,16 +610,75 @@ ggplot(dataFigure, aes(S, ShannonI, color=as.factor(nestedness)))+
   theme_bw()+
   facet_grid( specialization~Resources.given, labeller = label_both)
 
-##Figure 17: Ratio intial/final specialization score
+##Figure S8: Ratio intial/final specialization score
     dataw05$ratio<- dataw05$Speafter/dataw05$Spebefore
     ggplot(dataw05, aes((specialization),ratio, fill=specialization))+
       geom_boxplot()+
       geom_hline(yintercept =1)+
       xlab("")+
       ylab("Ratio final/initial specialization score")+
-      theme_bw()
+      theme_bw
+
+ ##Figure S9- Initial Diversity ----
+    speci_labels <- c(
+      `-1` = "Random",
+     `0.85` = "Specialist"
+    )
     
-##Figure 18: Comparison Gupta-Interpolated R50
+    res_labels <- c(
+      `8` = "Resources given: 8",
+      `16` = "Resources given: 16",
+      `32` = "Resources given: 32",
+      `64` = "Resources given: 64"
+    )
+    
+    ggplot(disturbance[disturbance$type =="coex",], aes(as.factor(nestedness) ,ShannonI, fill=as.factor(nestedness) ))+
+      geom_boxplot()+
+      geom_jitter(color="black", size=0.4, alpha=0.7)+
+      ylab("Diversity (Shannon Index)")+
+      xlab("Nestedness")+
+      #ggtitle("Diversity of communities used for the disturbance analysis") +
+      labs(colour = "Nestedness")+
+      scale_x_discrete(labels=c( "0", "0.5", "1", "No CF"))+
+      theme_bw()+
+      theme(legend.position="none")+
+      facet_grid(specialization~Resources.given, labeller =  labeller(Resources.given = res_labels,
+                                                                      specialization = speci_labels))
+    ##Wilcox test on diversity
+    ###specialization
+    wilcox.test(disturbance$ShannonI[disturbance$type =="coex" & disturbance$specialization == "0.85"], disturbance$ShannonI[disturbance$type =="coex" &disturbance$specialization == "-1"])
+    ##crossfeeding
+    wilcox.test(disturbance$ShannonI[disturbance$type =="coex" & disturbance$nestedness == "-1"], disturbance$ShannonI[disturbance$type =="coex" &disturbance$nestedness != "-1"])
+    #resources given
+    wilcox.test(disturbance$ShannonI[disturbance$type =="coex" & disturbance$initial_resources_given == 64], disturbance$ShannonI[disturbance$type =="coex" &disturbance$initial_resources_given == 32])
+    #nestedness
+    pairwise.wilcox.test(disturbance$ShannonI[disturbance$type =="coex"], disturbance$nestedness[disturbance$type =="coex"])
+    
+  ##Figure S10- Initial Biomass---- 
+    ggplot(disturbance[disturbance$type =="coex",], aes(as.factor(nestedness) ,biomass, fill=as.factor(nestedness) ))+
+      geom_boxplot()+
+      geom_jitter(color="black", size=0.4, alpha=0.7)+
+      ylab("Total abundance")+
+      xlab("Nestedness")+
+      #ggtitle("Biomass of communities used for the disturbance analysis") +
+      labs(colour = "Nestedness")+
+      scale_x_discrete(labels=c( "0", "0.5", "1", "No CF"))+
+      theme_bw()+
+      theme(legend.position="none")+
+      facet_grid(specialization~Resources.given, labeller =  labeller(Resources.given = res_labels,
+                                                                      specialization = speci_labels))
+    ##Wilcox test on initial biomass
+    ###specialization
+    wilcox.test(disturbance$biomass[disturbance$type =="coex" & disturbance$specialization == "0.85"], disturbance$biomass[disturbance$type =="coex" &disturbance$specialization == "-1"])
+    ##crossfeeding
+    wilcox.test(disturbance$biomass[disturbance$type =="coex" & disturbance$nestedness == "-1"], disturbance$biomass[disturbance$type =="coex" &disturbance$nestedness != "-1"])
+    #resources given
+    wilcox.test(disturbance$biomass[disturbance$type =="coex" & disturbance$initial_resources_given == 64], disturbance$biomass[disturbance$type =="coex" &disturbance$initial_resources_given == 32])
+    #nestedness
+    pairwise.wilcox.test(disturbance$biomass[disturbance$type =="coex"], disturbance$nestedness[disturbance$type =="coex"])
+    
+    
+##Figure S11: Comparison Gupta-Interpolated R50
     ggplot(decay_parameter, aes(c50, Rc50))+
       geom_point()+
       ylab("Interpolated R50")+
